@@ -431,6 +431,10 @@ footer a{color:inherit}
       <div class="field"><label for="pKyuchi">住民税 非課税限度額の級地区分</label><select id="pKyuchi"><option value="350000" selected>1級地（基準額35万円）</option><option value="315000">2級地（基準額31.5万円）</option><option value="280000">3級地（基準額28万円）</option></select><span class="note">扶養親族がいる場合は 基準額×人数＋加算（均等割21万円／所得割32万円）＋10万円で判定します。</span></div>
     </div>
   </details>
+
+  <div class="btnrow" id="confirmRow" style="margin-top:20px">
+    <button class="act primary" id="btnConfirm">この条件で答えを出す</button>
+  </div>
 </section>
 
 
@@ -588,8 +592,9 @@ footer a{color:inherit}
    法改正時はここだけを差し替えれば全画面に反映されます。
    ========================================================================== */
 
-const VERSION = "2026年8月版 rev.6";
+const VERSION = "2026年8月版 rev.7";
 const CHANGELOG = [
+  ["2026年8月版 rev.7", "目的を選んだあと、前提を確認してから答えを出す形にした。前提が実態と違ったままの数字を先に見せないため、確認ボタンを押すまで答えを表示しない。確認後は項目を変えると答えが自動で更新される。"],
   ["2026年8月版 rev.6", "社会保険の加入と被扶養者の認定が実際には月額で判定される点を明記した。年収の答えに月額換算を添え、月額の目安を継続的に超えると年間の合計が基準を下回っていても扶養から外れ得ること、逆に一時的な超過なら維持できる場合があることを注記した。"],
   ["2026年8月版 rev.5", "目的を選んでから答えを出す形に作り替えた。最初に「何を知りたいですか」を尋ね、選んだ目的の答えに必要な項目だけを聞く。目的に「損しない範囲で稼ぎたい」（働き損の区間を求める）と「詳細にシミュレーションしたい」（全項目を設定してグラフや内訳まで見る）を追加。週の所定労働時間の既定を20時間未満に変更した。"],
   ["2026年8月版 rev.4", "デザインを改良。章見出しに番号バッジを付けて階層を明確にし、入力欄をグループ分けして密度を下げた。手取りの表示を主役として強調し、注意書きは種類ごとに色分けした背景を付けた。グラフには手取りの面塗りを加え、壁のラベルが線と重ならないようにした。計算内容の変更はない。"],
@@ -1322,6 +1327,7 @@ function render() {
   renderPicker(cfg);
   applyMode();
   if (!GOAL) return;              // 目的が未選択なら以降は計算しない
+  if (!CONFIRMED) return;         // 前提の確認前は答えを出さない
   renderAnswer(cfg);
   if (goalById(GOAL).kind !== "full") return;
 
@@ -1448,6 +1454,8 @@ function findReversal(cfg) {
 
 /** 選択中の目的。null なら未選択（目的の一覧だけを出す） */
 let GOAL = null;
+/** 前提の確認を終えたか。目的を選び直すと false に戻り、答えは出さない */
+let CONFIRMED = false;
 
 /** 目的の一覧を描く */
 function renderPicker(cfg) {
@@ -1462,12 +1470,12 @@ function renderPicker(cfg) {
 }
 
 function selectGoal(id, opts = {}) {
+  const changed = GOAL !== id;
   GOAL = id;
+  // 目的を選び直したら前提の確認からやり直す。前提が違ったままの答えを見せないため
+  if (changed) CONFIRMED = !!(goalById(id) && goalById(id).kind === "full");
   render();
-  if (!opts.silent) {
-    const target = id === "full" ? $("inputTitle") : $("answerTitle");
-    target.closest("section").scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  if (!opts.silent) $("inputCard").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 /** 選んだ目的に応じて、入力欄とセクションの表示を切り替える */
@@ -1476,7 +1484,8 @@ function applyMode() {
   const full = g && g.kind === "full";
 
   $("inputCard").hidden = !g;
-  $("answerCard").hidden = !g || full;
+  $("answerCard").hidden = !g || full || !CONFIRMED;
+  $("confirmRow").hidden = !g || full || CONFIRMED;
   document.querySelectorAll("section.card[data-full]").forEach(el => el.hidden = !full);
 
   // 入力欄の出し分け。詳細モードではすべて出す
@@ -1493,7 +1502,9 @@ function applyMode() {
     $("inputTitle").textContent = full ? "すべての条件を設定する" : "条件を確認してください";
     $("inputHint").textContent = full
       ? "全項目を設定できます。以降の結果はすべてこの条件で再計算されます。"
-      : `「${g.label}」の答えを出すのに必要な項目です。初期値のままでも構いません。`;
+      : CONFIRMED
+        ? "項目を変えると、下の答えも自動で更新されます。"
+        : `「${g.label}」の答えは、これらの前提で変わります。ご自身の状況に合っているか確認してから進んでください。`;
   }
   renumber();
 }
@@ -1792,7 +1803,7 @@ function toQuery() {
 }
 function fromQuery() {
   const p = new URLSearchParams(location.search);
-  if (p.has("goal") && goalById(p.get("goal"))) GOAL = p.get("goal");
+  if (p.has("goal") && goalById(p.get("goal"))) { GOAL = p.get("goal"); CONFIRMED = true; }
   if (![...p.keys()].length) return;
   Object.entries(F).forEach(([k,el]) => {
     if (!p.has(k)) return;
@@ -1816,6 +1827,12 @@ Object.values(F).forEach(el => {
   el.addEventListener("change", render);
 });
 
+$("btnConfirm").addEventListener("click", () => {
+  CONFIRMED = true;
+  render();
+  $("answerCard").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
 $("btnDetail").addEventListener("click", () => selectGoal("full"));
 
 $("btnShare").addEventListener("click", async () => {
@@ -1828,7 +1845,7 @@ $("btnReset").addEventListener("click", () => {
   Object.entries(F).forEach(([k,el]) => {
     if (el.type === "checkbox") el.checked = DEFAULTS[k]; else el.value = DEFAULTS[k];
   });
-  GOAL = null;
+  GOAL = null; CONFIRMED = false;
   history.replaceState(null, "", location.pathname);
   render();
 });
