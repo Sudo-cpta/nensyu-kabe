@@ -152,27 +152,20 @@ details.adv .grid{margin-top:16px}
 .tile .d{font-size:12px; color:var(--text-muted); margin-top:3px; line-height:1.5}
 .hero-row .tile:first-child{grid-column:1/-1; padding-bottom:4px}
 
-/* ---------- 目的カード ---------- */
-.goals{display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:12px}
+/* ---------- 目的の選択カード ---------- */
+.goals{display:grid; grid-template-columns:repeat(auto-fit,minmax(228px,1fr)); gap:12px}
 .goal{
   text-align:left; font:inherit; cursor:pointer; width:100%;
   background:var(--surface-1); border:1px solid var(--axis); border-radius:var(--r-md);
-  padding:15px 16px; transition:border-color .12s, background .12s, transform .08s;
-  display:flex; flex-direction:column; gap:3px; color:var(--text-primary);
+  padding:16px 17px; transition:border-color .12s, background .12s, transform .08s;
+  display:flex; flex-direction:column; gap:6px; color:var(--text-primary);
 }
 .goal:hover{border-color:var(--accent); background:var(--accent-wash)}
 .goal:active{transform:translateY(1px)}
 .goal:focus-visible{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-wash)}
-.goal .q{font-size:13.5px; font-weight:700; line-height:1.5; min-height:3em}
-.goal .amt{
-  font-size:27px; font-weight:700; letter-spacing:-.03em; line-height:1.3;
-  color:var(--accent-ink); white-space:nowrap;
-}
-.goal .amt small{font-size:14px; font-weight:700; margin-left:3px; letter-spacing:0}
-.goal .sub{font-size:11.5px; color:var(--text-muted); line-height:1.55; margin-top:auto; padding-top:6px}
-.goal.na{cursor:default; background:var(--surface-2); border-style:dashed}
-.goal.na:hover{border-color:var(--axis); background:var(--surface-2)}
-.goal.na .amt{font-size:17px; color:var(--text-secondary); letter-spacing:0}
+.goal.sel{border-color:var(--accent); background:var(--accent-wash); box-shadow:0 0 0 1px var(--accent) inset}
+.goal .q{font-size:14px; font-weight:700; line-height:1.5}
+.goal .sub{font-size:11.5px; color:var(--text-muted); line-height:1.55}
 
 /* ---------- コールアウト ---------- */
 .callout{
@@ -281,13 +274,20 @@ footer a{color:inherit}
   </div>
 </header>
 
+<!-- ===================== 目的を選ぶ ===================== -->
+<section class="card" id="pickCard">
+  <h2><span class="n"></span>何を知りたいですか</h2>
+  <p class="hint">目的を選ぶと、その答えを出すのに必要な項目だけをお聞きします。</p>
+  <div class="goals" id="goalPicker"></div>
+</section>
+
 <!-- ===================== 入力 ===================== -->
-<section class="card">
-  <h2><span class="n">1</span>あなたの状況</h2>
-  <p class="hint">まずここを埋めてください。以降の結果はすべてこの条件で再計算されます。</p>
-  <div class="grp">あなたのこと</div>
+<section class="card" id="inputCard">
+  <h2><span class="n"></span><span id="inputTitle">条件を確認してください</span></h2>
+  <p class="hint" id="inputHint"></p>
+  <div class="grp" data-need="tax fuyou shaho family tuition noloss">あなたのこと</div>
   <div class="grid">
-    <div class="field">
+    <div class="field" data-need="tax fuyou shaho family tuition noloss">
       <label for="year">年分（収入を得る年）</label>
       <select id="year">
         <option value="2025">令和7年分（2025年）</option>
@@ -298,7 +298,7 @@ footer a{color:inherit}
       <span class="note" id="yearNote"></span>
     </div>
 
-    <div class="field">
+    <div class="field" data-need="fuyou shaho family tuition noloss">
       <label for="role">あなたの立場</label>
       <select id="role">
         <option value="spouse">配偶者（夫・妻の扶養に入っている／入りたい）</option>
@@ -310,7 +310,7 @@ footer a{color:inherit}
       <span class="note" id="roleNote"></span>
     </div>
 
-    <div class="field">
+    <div class="field" id="incomeField" data-need="">
       <label for="income">あなたの年収（給与・額面）</label>
       <div class="income-row">
         <input type="number" id="income" min="0" max="4000000" step="10000" value="1300000">
@@ -319,13 +319,13 @@ footer a{color:inherit}
       <input type="range" id="incomeRange" min="0" max="3000000" step="10000" value="1300000">
     </div>
 
-    <div class="field">
+    <div class="field" data-need="shaho noloss">
       <label for="isStudent">学生かどうか</label>
       <div class="checkline"><input type="checkbox" id="isStudent"><label for="isStudent">学生である（勤労学生控除・社会保険の適用除外）</label></div>
       <span class="note">学生は週20時間以上でも厚生年金・健康保険の加入対象から除外されます（夜間・通信制等を除く）。</span>
     </div>
 
-    <div class="field">
+    <div class="field" data-need="family noloss">
       <label for="supporterIncome">扶養者（親・配偶者）の年収</label>
       <div class="income-row">
         <input type="number" id="supporterIncome" min="0" max="30000000" step="100000" value="6000000">
@@ -334,24 +334,24 @@ footer a{color:inherit}
       <span class="note">この人の税額があなたの年収でどう変わるかを計算します。</span>
     </div>
 
-    <div class="field">
+    <div class="field" data-need="noloss">
       <label for="age40">介護保険（第2号被保険者）</label>
       <div class="checkline"><input type="checkbox" id="age40"><label for="age40">あなたは40歳以上65歳未満</label></div>
       <span class="note">該当すると健康保険料に介護保険料率が上乗せされます。</span>
     </div>
   </div>
 
-  <div class="grp">働き方と社会保険</div>
+  <div class="grp" data-need="shaho noloss">働き方と社会保険</div>
   <div class="grid">
-    <div class="field">
+    <div class="field" data-need="shaho noloss">
       <label for="weekly20">週の所定労働時間</label>
       <select id="weekly20">
-        <option value="1" selected>20時間以上（＋2か月超の雇用見込み）</option>
-        <option value="0">20時間未満</option>
+        <option value="0" selected>20時間未満</option>
+        <option value="1">20時間以上（＋2か月超の雇用見込み）</option>
         <option value="2">30時間以上（フルタイムの4分の3以上）</option>
       </select>
     </div>
-    <div class="field">
+    <div class="field" data-need="shaho noloss">
       <label for="firmSize">勤務先の従業員数</label>
       <select id="firmSize">
         <option value="51" selected>51人以上</option>
@@ -361,13 +361,13 @@ footer a{color:inherit}
         <option value="1">10人以下</option>
       </select>
     </div>
-    <div class="field">
+    <div class="field" data-need="shaho noloss">
       <label for="regime">社会保険の判定時点</label>
       <select id="regime"></select>
       <span class="note" id="regimeNote"></span>
       <span class="note">被扶養者の認定は、入力された年収による単純判定です。2026年4月以降は労働契約上の賃金から見込む年間収入で認定できる場合があり、最終的な可否は保険者の判断によります。</span>
     </div>
-    <div class="field">
+    <div class="field" data-need="noloss">
       <label for="kokuhoMode">国民健康保険料の計算方法</label>
       <select id="kokuhoMode">
         <option value="estimate" selected>概算する（本ツール独自の仮定値）</option>
@@ -392,19 +392,19 @@ footer a{color:inherit}
     </div>
   </div>
 
-  <details class="adv">
+  <details class="adv" data-need="tuition">
     <summary>多子世帯の学費支援（大学等）</summary>
     <div class="grid">
-      <div class="field">
+      <div class="field" data-need="tuition">
         <label for="kidsCount">生計維持者が扶養している子の人数（あなたを含む）</label>
         <input type="number" id="kidsCount" min="0" max="10" step="1" value="3">
         <span class="note">3人以上で「多子世帯」＝所得制限なしで授業料・入学金が上限まで減免されます。</span>
       </div>
-      <div class="field">
+      <div class="field" data-need="tuition">
         <label for="uniKids">うち大学等に在学中の人数</label>
         <input type="number" id="uniKids" min="0" max="10" step="1" value="2">
       </div>
-      <div class="field">
+      <div class="field" data-need="tuition">
         <label for="uniType">在学先（減免上限の目安）</label>
         <select id="uniType">
           <option value="private">私立大学（授業料70万円／年）</option>
@@ -415,7 +415,7 @@ footer a{color:inherit}
     </div>
   </details>
 
-  <details class="adv">
+  <details class="adv" data-need="">
     <summary>詳細パラメータ（保険料率・国保・住民税）</summary>
     <div class="grid">
       <div class="field"><label for="pHealth">健康保険料率（％・労使合計）</label><input type="number" id="pHealth" step="0.01" value="9.85"><span class="note">協会けんぽ東京都・令和8年度</span></div>
@@ -430,15 +430,18 @@ footer a{color:inherit}
   </details>
 </section>
 
-<!-- ===================== 目的から逆算 ===================== -->
-<section class="card">
-  <h2><span class="n">2</span>目的から逆算する</h2>
-  <p class="hint">「いくらまでなら大丈夫か」を、目的別に逆算しました。カードを押すと、その年収で試算し直します。</p>
-  <div class="goals" id="goals"></div>
+
+<!-- ===================== 答え ===================== -->
+<section class="card result" id="answerCard">
+  <h2><span class="n"></span><span id="answerTitle">答え</span></h2>
+  <div id="answerBody"></div>
+  <div class="btnrow" style="margin-top:18px">
+    <button class="act" id="btnDetail">グラフや内訳も見る（詳細シミュレーション）</button>
+  </div>
 </section>
 
 <!-- ===================== 結果サマリ ===================== -->
-<section class="card result">
+<section class="card result" data-full>
   <h2><span class="n">3</span>この年収でのあなたの手取り</h2>
   <p class="hint" id="statusLine"></p>
   <div class="hero-row">
@@ -451,7 +454,7 @@ footer a{color:inherit}
 </section>
 
 <!-- ===================== グラフ ===================== -->
-<section class="card">
+<section class="card" data-full>
   <div class="chart-head">
     <div>
       <h2><span class="n">4</span>年収を変えたときの手取りカーブ</h2>
@@ -471,7 +474,7 @@ footer a{color:inherit}
 </section>
 
 <!-- ===================== 内訳 ===================== -->
-<section class="card">
+<section class="card" data-full>
   <div class="chart-head">
     <div>
       <h2><span class="n">5</span>額面年収の内訳</h2>
@@ -494,7 +497,7 @@ footer a{color:inherit}
 </section>
 
 <!-- ===================== 壁一覧 ===================== -->
-<section class="card">
+<section class="card" data-full>
   <h2><span class="n">6</span>あなたに関係する「壁」の一覧</h2>
   <p class="hint">選んだ年分・立場で実際に効く壁だけを並べています。網掛けの行が、いまの年収が到達している段階です。</p>
   <div class="tbl-scroll">
@@ -506,14 +509,14 @@ footer a{color:inherit}
 </section>
 
 <!-- ===================== 多子世帯 ===================== -->
-<section class="card" id="tashiCard">
+<section class="card" id="tashiCard" data-full>
   <h2><span class="n">7</span>多子世帯の学費支援への影響</h2>
   <p class="hint">扶養する子が3人以上いる世帯は、所得制限なしで大学等の授業料・入学金が上限まで減免されます。あなたが扶養から外れると、その人数カウントが崩れます。</p>
   <div id="tashiBody"></div>
 </section>
 
 <!-- ===================== 共有 ===================== -->
-<section class="card">
+<section class="card" data-full>
   <h2><span class="n">8</span>この条件を共有する</h2>
   <p class="hint">いまの入力内容をURLに埋め込みます。SNSやメールでそのまま渡せます。</p>
   <div class="btnrow">
@@ -581,8 +584,9 @@ footer a{color:inherit}
    法改正時はここだけを差し替えれば全画面に反映されます。
    ========================================================================== */
 
-const VERSION = "2026年8月版 rev.4";
+const VERSION = "2026年8月版 rev.5";
 const CHANGELOG = [
+  ["2026年8月版 rev.5", "目的を選んでから答えを出す形に作り替えた。最初に「何を知りたいですか」を尋ね、選んだ目的の答えに必要な項目だけを聞く。目的に「損しない範囲で稼ぎたい」（働き損の区間を求める）と「詳細にシミュレーションしたい」（全項目を設定してグラフや内訳まで見る）を追加。週の所定労働時間の既定を20時間未満に変更した。"],
   ["2026年8月版 rev.4", "デザインを改良。章見出しに番号バッジを付けて階層を明確にし、入力欄をグループ分けして密度を下げた。手取りの表示を主役として強調し、注意書きは種類ごとに色分けした背景を付けた。グラフには手取りの面塗りを加え、壁のラベルが線と重ならないようにした。計算内容の変更はない。"],
   ["2026年8月版 rev.3", "PRレビューの指摘を反映。19歳以上23歳未満（配偶者を除く）の健康保険の被扶養者認定基準を150万円未満に修正（2025年10月1日以降）。多子世帯の「子ども」の算入上限を、学生世代の特定親族について合計所得95万円に修正。住民税の非課税限度額に扶養親族数と級地区分を導入し、所得割と均等割を別々に判定するようにした。調整控除を合計所得2,500万円超で適用なしとした。国保の賦課限度額を区分別の合計とし、40歳未満に介護分を含めないようにした。"],
   ["2026年8月版 rev.2", "一次資料に基づく監査を反映。調整控除の人的控除差を独立マスタ化し、特定親族特別控除・配偶者特別控除の差額を0円に修正（従来は所得税と住民税の控除額の実差を用いており、扶養者の住民税を最大9,000円過小に計上していた）。給与所得控除の境界帯（給与収入2,191,000〜2,199,999円）の定額処理を追加。国民健康保険に平等割と均等割・平等割の軽減（7割／5割／2割）を追加。"],
@@ -1060,50 +1064,67 @@ function maxIncomeFor(pred, cfg) {
   return lo;
 }
 
-/** 画面に出す「目的」の一覧。cfg に応じて出す・出さないを切り替える */
-function goals(cfg) {
-  const P = cfg.P, out = [];
-  const add = (id, q, note, pred) => {
-    const amount = maxIncomeFor(pred, cfg);
-    out.push({ id, q, note, amount });
-  };
+/**
+ * 利用者が選ぶ「目的」。
+ * need  : この目的の答えを出すために入力が必要な項目（data-need と対応）
+ * avail : その条件でこの目的を出す意味があるか
+ * kind  : limit＝上限額を求める／noloss＝逆転区間を求める／full＝全項目で詳細に見る
+ */
+const GOALS = [
+  { id:"tax", kind:"limit", label:"税金を1円も払いたくない",
+    lead:"所得税も住民税もかからない範囲を知りたい",
+    note:"所得税・住民税（均等割を含む）がどちらもゼロで収まる範囲です。",
+    avail:()=>true,
+    pred:(s2,c)=>{ const r=simulate(s2,c); return r.tax===0 && r.jumin===0; } },
 
-  add("tax", "税金を1円も払いたくない",
-      "所得税も住民税（均等割を含む）もかからない範囲です。",
-      (s2, c) => { const r = simulate(s2, c); return r.tax === 0 && r.jumin === 0; });
+  { id:"fuyou", kind:"limit", label:"社会保険の扶養から外れたくない",
+    lead:"親や配偶者の健康保険に入ったままでいたい",
+    avail:c=>c.hasSupporter,
+    note:c=>c.role==="child1922"
+      ? `19歳以上23歳未満（配偶者を除く）の被扶養者の年間収入要件は${man(fuyoNinteiLimit(c))}未満です（2025年10月1日以降の認定から）。`
+      : `健康保険の被扶養者の年間収入要件は${man(fuyoNinteiLimit(c))}未満です。`,
+    pred:(s2,c)=>socialInsurance(s2,c).status==="fuyou" },
 
-  if (cfg.hasSupporter) {
-    const nintei = fuyoNinteiLimit(cfg);
-    add("fuyou", "社会保険の扶養から外れたくない",
-        cfg.role === "child1922"
-          ? `19歳以上23歳未満の被扶養者の基準は${man(nintei)}未満です（2025年10月1日以降）。`
-          : `健康保険の被扶養者の基準は${man(nintei)}未満です。`,
-        (s2, c) => socialInsurance(s2, c).status === "fuyou");
+  { id:"shaho", kind:"limit", label:"自分で社会保険料を払いたくない",
+    lead:"健康保険料や年金を自分で負担したくない",
+    note:"勤務先の社会保険にも国民健康保険にも入らずに済む範囲です。",
+    avail:()=>true,
+    pred:(s2,c)=>socialInsurance(s2,c).total===0 },
 
-    add("family", "扶養者（親・配偶者）の税を増やしたくない",
-        "あなたの収入によって扶養者の所得税・住民税が増え始めない範囲です。",
-        (s2, c) => { const r = simulate(s2, c); return !r.sup || r.sup.increase === 0; });
+  { id:"family", kind:"limit", label:"親や配偶者の税を増やしたくない",
+    lead:"自分が働くことで家族の負担を増やしたくない",
+    note:"あなたの収入によって扶養者の所得税・住民税が増え始めない範囲です。",
+    avail:c=>c.hasSupporter,
+    pred:(s2,c)=>{ const r=simulate(s2,c); return !r.sup || r.sup.increase===0; } },
+
+  { id:"tuition", kind:"limit", label:"多子世帯の学費支援を失いたくない",
+    lead:"きょうだいの授業料減免を守りたい",
+    note:"あなたが「扶養する子」に数えられ続ける範囲です。判定は前年の所得に基づき、算入には別途書類の提出が必要です。",
+    avail:c=>c.kidsCount>=3 && c.uniKids>=1 && c.role!=="spouse" && c.role!=="single",
+    pred:(s2,c)=>kyuyoShotoku(s2,c.P)<=tashiLimitShotoku(c.role,c.P) },
+
+  { id:"noloss", kind:"noloss", label:"損しない範囲で稼ぎたい",
+    lead:"働いた分だけ手取りが増える範囲を知りたい",
+    avail:()=>true },
+
+  { id:"full", kind:"full", label:"詳細にシミュレーションしたい",
+    lead:"すべての条件を自分で設定して、グラフや内訳まで見たい",
+    avail:()=>true },
+];
+
+const goalById = id => GOALS.find(g => g.id === id) || null;
+
+/** 目的ごとの答えを求める */
+function answerFor(goal, cfg) {
+  if (goal.kind === "limit") {
+    const amount = maxIncomeFor(goal.pred, cfg);
+    return { kind:"limit", amount, net: amount === null ? null : simulate(amount, cfg).net };
   }
-
-  add("shaho", "自分で社会保険料を払いたくない",
-      "勤務先の社会保険にも国民健康保険にも入らずに済む範囲です。",
-      (s2, c) => socialInsurance(s2, c).total === 0);
-
-  if (cfg.kidsCount >= 3 && cfg.uniKids >= 1 && cfg.role !== "spouse" && cfg.role !== "single") {
-    const lim = tashiLimitShotoku(cfg.role, P);
-    add("tuition", "多子世帯の学費支援を失いたくない",
-        "あなたが「扶養する子」に数えられ続ける範囲です。判定は前年の所得に基づきます。",
-        (s2) => kyuyoShotoku(s2, P) <= lim);
+  if (goal.kind === "noloss") {
+    const rev = findReversal(cfg);
+    return { kind:"noloss", rev };
   }
-
-  // 同じ金額（または同じ「不可」）になった目的は先に出たものだけ残す。
-  // 例：週20時間未満なら「扶養から外れる」と「社会保険料が発生する」は同じ年収で起きる。
-  const seen = new Set();
-  return out.filter(g => {
-    const k = String(g.amount);
-    if (seen.has(k)) return false;
-    seen.add(k); return true;
-  });
+  return { kind:"full" };
 }
 
 /* ========================= 壁の一覧 ========================= */
@@ -1273,8 +1294,13 @@ function render() {
     ? `${kpDesc}で計算します。`
     : `${kpDesc}で計算します。これは公式な全国標準値ではなく本ツール独自の仮定値です（誤差 ±${Math.round(kp.band*100)}％程度）。`;
 
+  renderPicker(cfg);
+  applyMode();
+  if (!GOAL) return;              // 目的が未選択なら以降は計算しない
+  renderAnswer(cfg);
+  if (goalById(GOAL).kind !== "full") return;
+
   const r = simulate(cfg.income, cfg);
-  renderGoals(cfg);
   renderSummary(r, cfg);
   renderChart(cfg);
   renderStack(r, cfg);
@@ -1392,27 +1418,141 @@ function findReversal(cfg) {
   return { ...best, recover, cause };
 }
 
-/* ---------- 目的カード ---------- */
-function renderGoals(cfg) {
-  const box = $("goals");
-  box.innerHTML = goals(cfg).map(g => {
-    if (g.amount === null)
-      return `<div class="goal na"><div class="q">${g.q}</div>
-        <div class="amt">この条件では不可</div>
-        <div class="sub">いまの働き方では、年収に関係なく成立しません。${g.note}</div></div>`;
-    const net = simulate(g.amount, cfg).net;
-    return `<button type="button" class="goal" data-amount="${g.amount}">
-      <div class="q">${g.q}</div>
-      <div class="amt">${man(g.amount)}<small>まで</small></div>
-      <div class="sub">このとき手取り ${yen(net)}<br>${g.note}</div>
-    </button>`;
-  }).join("");
-  box.querySelectorAll("button.goal").forEach(b => b.addEventListener("click", () => {
-    F.income.value = b.dataset.amount;
-    F.incomeRange.value = Math.min(3000000, +b.dataset.amount);
-    render();
-    document.getElementById("tNet").closest("section").scrollIntoView({behavior:"smooth", block:"start"});
-  }));
+/* ---------- 目的の選択とモード制御 ---------- */
+
+/** 選択中の目的。null なら未選択（目的の一覧だけを出す） */
+let GOAL = null;
+
+/** 目的の一覧を描く */
+function renderPicker(cfg) {
+  const box = $("goalPicker");
+  box.innerHTML = GOALS.filter(g => g.avail(cfg)).map(g => `
+    <button type="button" class="goal${GOAL === g.id ? " sel" : ""}" data-goal="${g.id}">
+      <div class="q">${g.label}</div>
+      <div class="sub">${g.lead}</div>
+    </button>`).join("");
+  box.querySelectorAll("button.goal").forEach(b =>
+    b.addEventListener("click", () => selectGoal(b.dataset.goal)));
+}
+
+function selectGoal(id, opts = {}) {
+  GOAL = id;
+  render();
+  if (!opts.silent) {
+    const target = id === "full" ? $("inputTitle") : $("answerTitle");
+    target.closest("section").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+/** 選んだ目的に応じて、入力欄とセクションの表示を切り替える */
+function applyMode() {
+  const g = goalById(GOAL);
+  const full = g && g.kind === "full";
+
+  $("inputCard").hidden = !g;
+  $("answerCard").hidden = !g || full;
+  document.querySelectorAll("section.card[data-full]").forEach(el => el.hidden = !full);
+
+  // 入力欄の出し分け。詳細モードではすべて出す
+  document.querySelectorAll("[data-need]").forEach(el => {
+    el.hidden = full ? false : !(g && el.dataset.need.split(" ").includes(g.id));
+  });
+  // 年収の入力は詳細モードでだけ使う（目的モードでは上限額を答えとして出すため）
+  $("incomeField").hidden = !full;
+  // 多子世帯の折りたたみは、その目的のときだけ開いておく
+  const tashi = document.querySelector('details[data-need="tuition"]');
+  if (tashi) tashi.open = !full && g && g.id === "tuition";
+
+  if (g) {
+    $("inputTitle").textContent = full ? "すべての条件を設定する" : "条件を確認してください";
+    $("inputHint").textContent = full
+      ? "全項目を設定できます。以降の結果はすべてこの条件で再計算されます。"
+      : `「${g.label}」の答えを出すのに必要な項目です。初期値のままでも構いません。`;
+  }
+  renumber();
+}
+
+/** 表示中のセクションに通し番号を振る */
+function renumber() {
+  let i = 0;
+  document.querySelectorAll("section.card").forEach(sec => {
+    if (sec.hidden) return;
+    const n = sec.querySelector("h2 .n");
+    if (n) n.textContent = ++i;
+  });
+}
+
+/** 答えを描く */
+function renderAnswer(cfg) {
+  const g = goalById(GOAL);
+  if (!g || g.kind === "full") return;
+  const a = answerFor(g, cfg);
+  const note = typeof g.note === "function" ? g.note(cfg) : (g.note || "");
+  $("answerTitle").textContent = g.label;
+  const box = $("answerBody");
+
+  if (a.kind === "limit") {
+    if (a.amount === null) {
+      // 何を変えれば成立するかを実際に試し、可能なら具体的に示す
+      const tries = [
+        { label: "週の所定労働時間を「20時間未満」にする", cfg: { ...cfg, weekly: 0 } },
+        { label: "勤務先の従業員数が「10人以下」の場合", cfg: { ...cfg, firmSize: 1 } },
+      ];
+      let hint = "";
+      for (const t of tries) {
+        const v = maxIncomeFor(g.pred, t.cfg);
+        if (v !== null) {
+          hint = `<div class="callout good"><div class="ttl">✓ こうすれば成立します</div>`
+               + `<b>${t.label}</b>と、<b>${man(v)}</b>まで可能になります。`
+               + `上の条件欄で変更すると、この答えも変わります。</div>`;
+          break;
+        }
+      }
+      box.innerHTML = `<div class="tile"><div class="k">この条件では成立しません</div>`
+        + `<div class="v hero">年収に関係なく不可</div>`
+        + `<div class="d">${note}</div></div>`
+        + (hint || `<div class="callout warn"><div class="ttl">! 条件を変えてみてください</div>`
+            + `上の条件欄で働き方や立場を変えると、成立する場合があります。</div>`);
+    } else {
+      box.innerHTML = `<div class="hero-row">
+        <div class="tile"><div class="k">この年収までなら大丈夫です</div>
+          <div class="v hero">${man(a.amount)}</div>
+          <div class="d">正確には ${yen(a.amount)} まで</div></div>
+        <div class="tile"><div class="k">そのときの手取り</div>
+          <div class="v">${yen(a.net)}</div>
+          <div class="d">額面の ${(a.amount ? a.net/a.amount*100 : 0).toFixed(1)}%</div></div>
+      </div>
+      <div class="callout"><div class="ttl">この数字の意味</div>${note}</div>`;
+    }
+    return;
+  }
+
+  // 損しない範囲
+  const rev = a.rev;
+  if (!rev) {
+    box.innerHTML = `<div class="tile"><div class="k">損する区間はありません</div>
+      <div class="v hero">上限なし</div>
+      <div class="d">いまの条件では、稼いだ分だけ世帯の手取りが増えます</div></div>
+      <div class="callout good"><div class="ttl">✓ 壁による逆転は起きません</div>
+      働く時間を増やしても、世帯全体の手取りが減る区間は生じません。
+      控除が減って税が増える壁はありますが、増えた収入がそれを上回ります。</div>`;
+    return;
+  }
+  box.innerHTML = `<div class="hero-row">
+      <div class="tile"><div class="k">ここまでなら損しません</div>
+        <div class="v hero">${man(rev.peak)}</div>
+        <div class="d">世帯の手取り増加額 ${yen(rev.netPeak)}</div></div>
+      <div class="tile"><div class="k">超えるならこの年収以上に</div>
+        <div class="v">${rev.recover ? man(rev.recover) : "300万円超"}</div>
+        <div class="d">ここまで稼げば損を取り戻せます</div></div>
+      <div class="tile"><div class="k">いちばん損する年収</div>
+        <div class="v">${man(rev.at)}</div>
+        <div class="d">${yen(rev.drop)} のマイナス</div></div>
+    </div>
+    <div class="callout crit"><div class="ttl">⚠ ${man(rev.peak)} 〜 ${rev.recover ? man(rev.recover) : "300万円"} は働き損の区間です${rev.cause ? "（" + rev.cause.name + "）" : ""}</div>
+      この区間では、働く時間を増やしても世帯全体の手取りが${man(rev.peak)}のときを下回ります。
+      <b>${man(rev.peak)}に抑える</b>か、<b>${rev.recover ? man(rev.recover) : "300万円"}以上まで働く</b>かの
+      どちらかを選ぶのが合理的です。中途半端がいちばん損をします。</div>`;
 }
 
 /* ---------- 折れ線グラフ ---------- */
@@ -1615,6 +1755,7 @@ function renderTashi(cfg) {
 /* ---------- URL共有 ---------- */
 function toQuery() {
   const p = new URLSearchParams();
+  if (GOAL) p.set("goal", GOAL);
   Object.entries(F).forEach(([k,el]) => {
     const v = el.type === "checkbox" ? (el.checked ? "1" : "0") : el.value;
     if (String(v) !== String(DEFAULTS[k])) p.set(k, v);
@@ -1623,6 +1764,7 @@ function toQuery() {
 }
 function fromQuery() {
   const p = new URLSearchParams(location.search);
+  if (p.has("goal") && goalById(p.get("goal"))) GOAL = p.get("goal");
   if (![...p.keys()].length) return;
   Object.entries(F).forEach(([k,el]) => {
     if (!p.has(k)) return;
@@ -1646,6 +1788,8 @@ Object.values(F).forEach(el => {
   el.addEventListener("change", render);
 });
 
+$("btnDetail").addEventListener("click", () => selectGoal("full"));
+
 $("btnShare").addEventListener("click", async () => {
   const url = location.origin + location.pathname + (toQuery() ? "?" + toQuery() : "");
   try { await navigator.clipboard.writeText(url); }
@@ -1656,6 +1800,7 @@ $("btnReset").addEventListener("click", () => {
   Object.entries(F).forEach(([k,el]) => {
     if (el.type === "checkbox") el.checked = DEFAULTS[k]; else el.value = DEFAULTS[k];
   });
+  GOAL = null;
   history.replaceState(null, "", location.pathname);
   render();
 });
