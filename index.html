@@ -17,39 +17,43 @@
 <style>
 /* ============================================================
    トークン。ライトが既定、ダークは media と data-theme の2スコープ。
-   系列色は dataviz のリファレンスパレット（light/dark 検証済み）。
+   コーポレートカラー（ブルー／グレー／ゴールド）。light/dark とも
+   コントラスト・色覚多様性の検証を通したうえで採用している。
    ============================================================ */
 :root {
   color-scheme: light;
-  --surface-1:#fdfcfa; --surface-2:#f2efe8; --page:#f7f5f0;
-  --text-primary:#16150f; --text-secondary:#55524a; --text-muted:#8b8779;
-  --grid:#e7e3d9; --axis:#c9c4b6; --border:rgba(22,21,15,.10);
-  --accent:#3b4fa8; --accent-wash:#edeefa; --accent-ink:#2c3c85; --accent-btn:#3b4fa8;
-  --series-1:#3b4fa8; --series-2:#eb6834; --series-3:#1baf7a; --series-4:#eda100;
+  --surface-1:#ffffff; --surface-2:#f2f4f7; --page:#eceef1;
+  --text-primary:#12161c; --text-secondary:#4d545e; --text-muted:#666d76;
+  --grid:#e3e7ec; --axis:#c4cad2; --border:rgba(18,22,28,.11);
+  --accent:#1a5490; --accent-wash:#e8eef6; --accent-ink:#123c68; --accent-btn:#1a5490;
+  --gold:#c8951a; --gold-ink:#8a6510; --gold-wash:#faf3e2;
+  --series-1:#1a5490; --series-2:#eb6834; --series-3:#1baf7a; --series-4:#c8951a;
   --st-good:#0ca30c; --st-warning:#fab219; --st-critical:#d03b3b; --good-ink:#006300;
-  --crit-wash:#fdeeed; --warn-wash:#fdf5e2; --good-wash:#ecf6ec;
-  --shadow:0 1px 2px rgba(11,11,11,.04), 0 10px 28px rgba(11,11,11,.05);
-  --shadow-lift:0 2px 4px rgba(11,11,11,.05), 0 16px 40px rgba(11,11,11,.08);
+  --crit-wash:#fceded; --warn-wash:#fbf4e4; --good-wash:#ebf6ec;
+  --shadow:0 1px 2px rgba(18,22,28,.05), 0 10px 28px rgba(18,22,28,.06);
+  --shadow-lift:0 2px 4px rgba(18,22,28,.06), 0 16px 40px rgba(18,22,28,.10);
   --r-lg:16px; --r-md:10px; --r-sm:8px;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   color-scheme: dark;
-  --surface-1:#18181c; --surface-2:#232329; --page:#0e0e11;
-  --text-primary:#ffffff; --text-secondary:#c5c2b8; --text-muted:#8e8b83;
-  --grid:#2a2a31; --axis:#3b3b45; --border:rgba(255,255,255,.10);
-  --accent:#7b87d8; --accent-wash:#1d2040; --accent-ink:#aab3ea; --accent-btn:#4d5cbb;
-  --series-1:#7b87d8; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+  --surface-1:#181c22; --surface-2:#222831; --page:#0f1216;
+  --text-primary:#ffffff; --text-secondary:#c2cad4; --text-muted:#9aa2ad;
+  --grid:#282e37; --axis:#39414c; --border:rgba(255,255,255,.11);
+  --accent:#4a90d9; --accent-wash:#152435; --accent-ink:#9cc4f5; --accent-btn:#2a6db5;
+  --gold:#c98500; --gold-ink:#e0ad3f; --gold-wash:#2b2313;
+  --series-1:#4a90d9; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
   --good-ink:#0ca30c;
   --crit-wash:#2e1a1a; --warn-wash:#2c2515; --good-wash:#16261a;
   --shadow:none; --shadow-lift:none;
 }}
 :root[data-theme="dark"]{
   color-scheme: dark;
-  --surface-1:#18181c; --surface-2:#232329; --page:#0e0e11;
-  --text-primary:#ffffff; --text-secondary:#c5c2b8; --text-muted:#8e8b83;
-  --grid:#2a2a31; --axis:#3b3b45; --border:rgba(255,255,255,.10);
-  --accent:#7b87d8; --accent-wash:#1d2040; --accent-ink:#aab3ea; --accent-btn:#4d5cbb;
-  --series-1:#7b87d8; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+  --surface-1:#181c22; --surface-2:#222831; --page:#0f1216;
+  --text-primary:#ffffff; --text-secondary:#c2cad4; --text-muted:#9aa2ad;
+  --grid:#282e37; --axis:#39414c; --border:rgba(255,255,255,.11);
+  --accent:#4a90d9; --accent-wash:#152435; --accent-ink:#9cc4f5; --accent-btn:#2a6db5;
+  --gold:#c98500; --gold-ink:#e0ad3f; --gold-wash:#2b2313;
+  --series-1:#4a90d9; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
   --good-ink:#0ca30c;
   --crit-wash:#2e1a1a; --warn-wash:#2c2515; --good-wash:#16261a;
   --shadow:none; --shadow-lift:none;
@@ -69,6 +73,10 @@ b,strong{font-weight:700}
 /* ---------- ヘッダ ---------- */
 header{margin-bottom:28px}
 h1{font-size:clamp(26px,5vw,38px); line-height:1.2; letter-spacing:-.025em; font-weight:700}
+h1::after{
+  content:""; display:block; width:54px; height:3px; border-radius:2px;
+  background:var(--gold); margin-top:14px;
+}
 .sub{color:var(--text-secondary); margin:12px 0 16px; font-size:clamp(14px,2.4vw,17px); max-width:46em}
 .badges{display:flex; flex-wrap:wrap; gap:7px; align-items:center}
 .badge{
