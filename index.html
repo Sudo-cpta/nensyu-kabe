@@ -101,6 +101,8 @@ h1{font-size:clamp(26px,5vw,38px); line-height:1.2; letter-spacing:-.025em; font
   margin:22px 0 12px; padding-top:16px; border-top:1px solid var(--grid);
 }
 .grp:first-of-type{margin-top:0; padding-top:0; border-top:0}
+.note-line{font-size:12px; color:var(--text-muted); margin:-6px 0 14px; line-height:1.6}
+.note-line b{color:var(--text-secondary)}
 
 /* ---------- フォーム ---------- */
 .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:16px 20px}
@@ -342,6 +344,7 @@ footer a{color:inherit}
   </div>
 
   <div class="grp" data-need="shaho noloss">働き方と社会保険</div>
+  <p class="note-line" data-need="shaho noloss">社会保険の加入と被扶養者の認定は、<b>実際には月額で判定されます</b>。本ツールが示す年収は、12か月で均等に働いた場合の目安です。</p>
   <div class="grid">
     <div class="field" data-need="shaho noloss">
       <label for="weekly20">週の所定労働時間</label>
@@ -539,6 +542,7 @@ footer a{color:inherit}
     <li>給与所得の金額は、給与所得控除の最低保障額と計算式が切り替わる境界（令和8・9年分は給与収入2,191,000〜2,199,999円）で国税庁の表による定額処理を行っています。なお給与収入220万円〜660万円未満の範囲について、本ツールは計算式で1円単位に算出しており、国税庁「給与所得控除後の給与等の金額の表」の4,000円区分による丸めは行っていません（差は給与所得で最大1,400円程度、税額で数百円程度です）。</li>
     <li>調整控除に用いる人的控除の差額は地方税法上の定額です。<b>特定親族特別控除および配偶者特別控除の差額は0円</b>であり、所得税と住民税の控除額の実差（63万円と45万円の差など）ではありません。</li>
     <li>社会保険の適用拡大は、2026年10月に賃金要件（月額8.8万円）が撤廃され、企業規模要件が2027年10月以降に段階的に撤廃されます。</li>
+    <li><b>社会保険の加入と被扶養者の認定は、実際には月額で判定されます。</b>本ツールが示す年収は12か月で均等に働いた場合の目安であり、月額の目安を継続的に超えると、年間の合計が基準を下回っていても扶養から外れることがあります。逆に繁忙期に一時的に超えただけなら維持できる場合もあります。勤務先の社会保険についても、2026年9月まであった賃金要件は年収ではなく月額8.8万円で定められていました。</li>
     <li>健康保険の被扶養者認定の年間収入要件は130万円未満ですが、<b>配偶者を除く19歳以上23歳未満は2025年10月1日以降の認定から150万円未満</b>です（学生であることは要件ではありません）。また2026年4月以降は、一定の要件を満たす場合に労働契約上の賃金から見込む年間収入で認定できます。本ツールは入力された年収による単純判定で近似しており、実際の認定は保険者の判断によります。</li>
     <li>住民税の非課税限度額は、所得割と均等割で別式であり、扶養親族等がいる場合は加算があります。基準額は級地区分（1級地35万円／2級地31.5万円／3級地28万円）で変わります。扶養者側の扶養親族の数は、本ツールでは「本人が扶養の所得要件を満たすかどうか」のみで数えており、他のご家族は考慮していません。</li>
     <li>多子世帯の「子ども」の人数は、2026年度の判定から、生計維持者の特定親族特別控除の対象となる学生世代のうち合計所得95万円以下の者も算入されます。日本学生支援機構の判定は前年の所得（当年度の住民税情報）に基づき、算入には別途書類の提出が必要です。</li>
@@ -584,8 +588,9 @@ footer a{color:inherit}
    法改正時はここだけを差し替えれば全画面に反映されます。
    ========================================================================== */
 
-const VERSION = "2026年8月版 rev.5";
+const VERSION = "2026年8月版 rev.6";
 const CHANGELOG = [
+  ["2026年8月版 rev.6", "社会保険の加入と被扶養者の認定が実際には月額で判定される点を明記した。年収の答えに月額換算を添え、月額の目安を継続的に超えると年間の合計が基準を下回っていても扶養から外れ得ること、逆に一時的な超過なら維持できる場合があることを注記した。"],
   ["2026年8月版 rev.5", "目的を選んでから答えを出す形に作り替えた。最初に「何を知りたいですか」を尋ね、選んだ目的の答えに必要な項目だけを聞く。目的に「損しない範囲で稼ぎたい」（働き損の区間を求める）と「詳細にシミュレーションしたい」（全項目を設定してグラフや内訳まで見る）を追加。週の所定労働時間の既定を20時間未満に変更した。"],
   ["2026年8月版 rev.4", "デザインを改良。章見出しに番号バッジを付けて階層を明確にし、入力欄をグループ分けして密度を下げた。手取りの表示を主役として強調し、注意書きは種類ごとに色分けした背景を付けた。グラフには手取りの面塗りを加え、壁のラベルが線と重ならないようにした。計算内容の変更はない。"],
   ["2026年8月版 rev.3", "PRレビューの指摘を反映。19歳以上23歳未満（配偶者を除く）の健康保険の被扶養者認定基準を150万円未満に修正（2025年10月1日以降）。多子世帯の「子ども」の算入上限を、学生世代の特定親族について合計所得95万円に修正。住民税の非課税限度額に扶養親族数と級地区分を導入し、所得割と均等割を別々に判定するようにした。調整控除を合計所得2,500万円超で適用なしとした。国保の賦課限度額を区分別の合計とし、40歳未満に介護分を含めないようにした。"],
@@ -1077,7 +1082,7 @@ const GOALS = [
     avail:()=>true,
     pred:(s2,c)=>{ const r=simulate(s2,c); return r.tax===0 && r.jumin===0; } },
 
-  { id:"fuyou", kind:"limit", label:"社会保険の扶養から外れたくない",
+  { id:"fuyou", kind:"limit", monthly:true, label:"社会保険の扶養から外れたくない",
     lead:"親や配偶者の健康保険に入ったままでいたい",
     avail:c=>c.hasSupporter,
     note:c=>c.role==="child1922"
@@ -1085,7 +1090,7 @@ const GOALS = [
       : `健康保険の被扶養者の年間収入要件は${man(fuyoNinteiLimit(c))}未満です。`,
     pred:(s2,c)=>socialInsurance(s2,c).status==="fuyou" },
 
-  { id:"shaho", kind:"limit", label:"自分で社会保険料を払いたくない",
+  { id:"shaho", kind:"limit", monthly:true, label:"自分で社会保険料を払いたくない",
     lead:"健康保険料や年金を自分で負担したくない",
     note:"勤務先の社会保険にも国民健康保険にも入らずに済む範囲です。",
     avail:()=>true,
@@ -1113,6 +1118,24 @@ const GOALS = [
 ];
 
 const goalById = id => GOALS.find(g => g.id === id) || null;
+
+/** 年額を12で割った月額の目安 */
+const monthlyOf = a => Math.floor(a / 12);
+
+/**
+ * 社会保険の加入・被扶養者の判定は、実際には月額で行われる。
+ * 本ツールは年収で示しているため、その差をどこでも同じ文言で断っておく。
+ */
+function monthlyCaution(amount) {
+  return '<div class="callout warn"><div class="ttl">! 実際の判定は月額で行われます</div>'
+    + 'ここで示した年収は、<b>12か月で均等に働いた場合の目安</b>です。'
+    + (amount ? '月額に直すと <b>' + yen(monthlyOf(amount)) + '</b> 程度になります。' : '')
+    + '被扶養者の認定は「今後1年間の収入見込み」で判断されるため、'
+    + '<b>月額の目安を継続的に超えると、年間の合計が基準を下回っていても扶養から外れる</b>ことがあります。'
+    + '逆に繁忙期に一時的に超えただけなら維持できる場合もあります。'
+    + '勤務先の社会保険についても、2026年9月まであった賃金要件は月額8.8万円で定められていました。'
+    + '最終的な判断は保険者によりますので、境界に近い場合は勤務先または加入している健康保険にご確認ください。</div>';
+}
 
 /** 目的ごとの答えを求める */
 function answerFor(goal, cfg) {
@@ -1152,10 +1175,11 @@ function walls(cfg) {
   // --- 社会保険 ---
   if (!cfg.isStudent && cfg.weekly === 1 && cfg.firmSize >= regime.firm && regime.wageReq > 0) {
     add(regime.wageReq * 12, "106万円の壁",
-        "勤務先の厚生年金・健康保険に加入し、保険料の本人負担（約15%）が発生します。", "shaho");
+        `賃金要件は年収ではなく月額で定められており、月額 ${yen(regime.wageReq)} 以上が対象です。該当すると勤務先の厚生年金・健康保険に加入し、保険料の本人負担（約15%）が発生します。`, "shaho");
   }
   if (cfg.hasSupporter) {
     const nintei = fuyoNinteiLimit(cfg);
+    const niMonth = Math.floor(nintei / 12);
     const si130 = socialInsurance(nintei, cfg);
     if (si130.status !== "shaho") {
       add(nintei, `${nintei/10000}万円の壁`,
@@ -1164,7 +1188,8 @@ function walls(cfg) {
             : "健康保険の扶養から外れます。")
           + (cfg.isStudent
             ? "国民健康保険料が発生します（国民年金は学生納付特例で猶予可）。"
-            : "国民健康保険料と国民年金保険料が発生します。"), "shaho");
+            : "国民健康保険料と国民年金保険料が発生します。")
+          + `実際の判定は月額で行われ、月額 ${yen(niMonth)} 程度を継続的に超えるかどうかが目安になります。`, "shaho");
     }
   }
 
@@ -1311,11 +1336,12 @@ function render() {
 /* ---------- サマリ ---------- */
 function renderSummary(r, cfg) {
   const st = r.si.status;
+  const monthly = cfg.income > 0 ? `（月額 ${yen(Math.floor(cfg.income/12))} 相当）` : "";
   const stLabel = st === "shaho" ? "勤務先の社会保険に加入"
                 : st === "fuyou" ? "扶養内（社会保険料の本人負担なし）"
                 : "国民健康保険＋国民年金";
   $("statusLine").textContent =
-    `${cfg.P.label}／${stLabel}／住民税は${cfg.P.juminLabel}分として計算`;
+    `${cfg.P.label}／${stLabel}${monthly}／住民税は${cfg.P.juminLabel}分として計算`;
 
   $("tNet").textContent = yen(r.net);
   $("tNetSub").textContent = `額面 ${yen(cfg.income)} の ${(cfg.income ? r.net/cfg.income*100 : 0).toFixed(1)}%`;
@@ -1522,7 +1548,8 @@ function renderAnswer(cfg) {
           <div class="v">${yen(a.net)}</div>
           <div class="d">額面の ${(a.amount ? a.net/a.amount*100 : 0).toFixed(1)}%</div></div>
       </div>
-      <div class="callout"><div class="ttl">この数字の意味</div>${note}</div>`;
+      <div class="callout"><div class="ttl">この数字の意味</div>${note}</div>`
+        + (g.monthly ? monthlyCaution(a.amount) : "");
     }
     return;
   }
@@ -1552,7 +1579,8 @@ function renderAnswer(cfg) {
     <div class="callout crit"><div class="ttl">⚠ ${man(rev.peak)} 〜 ${rev.recover ? man(rev.recover) : "300万円"} は働き損の区間です${rev.cause ? "（" + rev.cause.name + "）" : ""}</div>
       この区間では、働く時間を増やしても世帯全体の手取りが${man(rev.peak)}のときを下回ります。
       <b>${man(rev.peak)}に抑える</b>か、<b>${rev.recover ? man(rev.recover) : "300万円"}以上まで働く</b>かの
-      どちらかを選ぶのが合理的です。中途半端がいちばん損をします。</div>`;
+      どちらかを選ぶのが合理的です。中途半端がいちばん損をします。</div>`
+    + (rev.cause && rev.cause.kind === "shaho" ? monthlyCaution(rev.peak) : "");
 }
 
 /* ---------- 折れ線グラフ ---------- */
