@@ -152,6 +152,28 @@ details.adv .grid{margin-top:16px}
 .tile .d{font-size:12px; color:var(--text-muted); margin-top:3px; line-height:1.5}
 .hero-row .tile:first-child{grid-column:1/-1; padding-bottom:4px}
 
+/* ---------- 目的カード ---------- */
+.goals{display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:12px}
+.goal{
+  text-align:left; font:inherit; cursor:pointer; width:100%;
+  background:var(--surface-1); border:1px solid var(--axis); border-radius:var(--r-md);
+  padding:15px 16px; transition:border-color .12s, background .12s, transform .08s;
+  display:flex; flex-direction:column; gap:3px; color:var(--text-primary);
+}
+.goal:hover{border-color:var(--accent); background:var(--accent-wash)}
+.goal:active{transform:translateY(1px)}
+.goal:focus-visible{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-wash)}
+.goal .q{font-size:13.5px; font-weight:700; line-height:1.5; min-height:3em}
+.goal .amt{
+  font-size:27px; font-weight:700; letter-spacing:-.03em; line-height:1.3;
+  color:var(--accent-ink); white-space:nowrap;
+}
+.goal .amt small{font-size:14px; font-weight:700; margin-left:3px; letter-spacing:0}
+.goal .sub{font-size:11.5px; color:var(--text-muted); line-height:1.55; margin-top:auto; padding-top:6px}
+.goal.na{cursor:default; background:var(--surface-2); border-style:dashed}
+.goal.na:hover{border-color:var(--axis); background:var(--surface-2)}
+.goal.na .amt{font-size:17px; color:var(--text-secondary); letter-spacing:0}
+
 /* ---------- コールアウト ---------- */
 .callout{
   border-left:3px solid var(--axis); background:var(--surface-2);
@@ -408,9 +430,16 @@ footer a{color:inherit}
   </details>
 </section>
 
+<!-- ===================== 目的から逆算 ===================== -->
+<section class="card">
+  <h2><span class="n">2</span>目的から逆算する</h2>
+  <p class="hint">「いくらまでなら大丈夫か」を、目的別に逆算しました。カードを押すと、その年収で試算し直します。</p>
+  <div class="goals" id="goals"></div>
+</section>
+
 <!-- ===================== 結果サマリ ===================== -->
 <section class="card result">
-  <h2><span class="n">2</span>この年収でのあなたの手取り</h2>
+  <h2><span class="n">3</span>この年収でのあなたの手取り</h2>
   <p class="hint" id="statusLine"></p>
   <div class="hero-row">
     <div class="tile"><div class="k">あなたの手取り（年間）</div><div class="v hero" id="tNet">—</div><div class="d" id="tNetSub"></div></div>
@@ -425,7 +454,7 @@ footer a{color:inherit}
 <section class="card">
   <div class="chart-head">
     <div>
-      <h2><span class="n">3</span>年収を変えたときの手取りカーブ</h2>
+      <h2><span class="n">4</span>年収を変えたときの手取りカーブ</h2>
       <p class="hint" style="margin:0">縦の細い線が「壁」。青と橙の差が、あなたの収入によって扶養者側に生じる増税分です。扶養者の税が増えていない区間では、2本の線は完全に重なります。</p>
     </div>
     <div class="legend">
@@ -445,7 +474,7 @@ footer a{color:inherit}
 <section class="card">
   <div class="chart-head">
     <div>
-      <h2><span class="n">4</span>額面年収の内訳</h2>
+      <h2><span class="n">5</span>額面年収の内訳</h2>
       <p class="hint" style="margin:0">額面がどこへ消えるか。数値は下の表にも掲載しています。</p>
     </div>
     <div class="legend">
@@ -466,7 +495,7 @@ footer a{color:inherit}
 
 <!-- ===================== 壁一覧 ===================== -->
 <section class="card">
-  <h2><span class="n">5</span>あなたに関係する「壁」の一覧</h2>
+  <h2><span class="n">6</span>あなたに関係する「壁」の一覧</h2>
   <p class="hint">選んだ年分・立場で実際に効く壁だけを並べています。網掛けの行が、いまの年収が到達している段階です。</p>
   <div class="tbl-scroll">
     <table id="wallTbl">
@@ -478,14 +507,14 @@ footer a{color:inherit}
 
 <!-- ===================== 多子世帯 ===================== -->
 <section class="card" id="tashiCard">
-  <h2><span class="n">6</span>多子世帯の学費支援への影響</h2>
+  <h2><span class="n">7</span>多子世帯の学費支援への影響</h2>
   <p class="hint">扶養する子が3人以上いる世帯は、所得制限なしで大学等の授業料・入学金が上限まで減免されます。あなたが扶養から外れると、その人数カウントが崩れます。</p>
   <div id="tashiBody"></div>
 </section>
 
 <!-- ===================== 共有 ===================== -->
 <section class="card">
-  <h2><span class="n">7</span>この条件を共有する</h2>
+  <h2><span class="n">8</span>この条件を共有する</h2>
   <p class="hint">いまの入力内容をURLに埋め込みます。SNSやメールでそのまま渡せます。</p>
   <div class="btnrow">
     <button class="act primary" id="btnShare">条件付きURLをコピー</button>
@@ -1011,6 +1040,72 @@ function simulate(shunyu, cfg) {
            deduct: si.total + t.tax + t.jumin, net, sup, houseGain, kinroOK };
 }
 
+/* ========================= 目的からの逆算 ========================= */
+
+/**
+ * 「その条件を満たせる年収の上限」を二分探索で求める。
+ * 対象の条件はいずれも「低い年収では成立し、ある額を超えると成立しない」単調な性質を持つ。
+ * 1,000円単位。最初から成立しない場合は null を返す。
+ */
+function maxIncomeFor(pred, cfg) {
+  const STEP = 1000, HI = 4000000;
+  if (!pred(0, cfg)) return null;
+  if (pred(HI, cfg)) return HI;
+  let lo = 0, hi = HI;
+  while (hi - lo > STEP) {
+    const mid = Math.round((lo + hi) / 2 / STEP) * STEP;
+    if (mid <= lo || mid >= hi) break;
+    if (pred(mid, cfg)) lo = mid; else hi = mid;
+  }
+  return lo;
+}
+
+/** 画面に出す「目的」の一覧。cfg に応じて出す・出さないを切り替える */
+function goals(cfg) {
+  const P = cfg.P, out = [];
+  const add = (id, q, note, pred) => {
+    const amount = maxIncomeFor(pred, cfg);
+    out.push({ id, q, note, amount });
+  };
+
+  add("tax", "税金を1円も払いたくない",
+      "所得税も住民税（均等割を含む）もかからない範囲です。",
+      (s2, c) => { const r = simulate(s2, c); return r.tax === 0 && r.jumin === 0; });
+
+  if (cfg.hasSupporter) {
+    const nintei = fuyoNinteiLimit(cfg);
+    add("fuyou", "社会保険の扶養から外れたくない",
+        cfg.role === "child1922"
+          ? `19歳以上23歳未満の被扶養者の基準は${man(nintei)}未満です（2025年10月1日以降）。`
+          : `健康保険の被扶養者の基準は${man(nintei)}未満です。`,
+        (s2, c) => socialInsurance(s2, c).status === "fuyou");
+
+    add("family", "扶養者（親・配偶者）の税を増やしたくない",
+        "あなたの収入によって扶養者の所得税・住民税が増え始めない範囲です。",
+        (s2, c) => { const r = simulate(s2, c); return !r.sup || r.sup.increase === 0; });
+  }
+
+  add("shaho", "自分で社会保険料を払いたくない",
+      "勤務先の社会保険にも国民健康保険にも入らずに済む範囲です。",
+      (s2, c) => socialInsurance(s2, c).total === 0);
+
+  if (cfg.kidsCount >= 3 && cfg.uniKids >= 1 && cfg.role !== "spouse" && cfg.role !== "single") {
+    const lim = tashiLimitShotoku(cfg.role, P);
+    add("tuition", "多子世帯の学費支援を失いたくない",
+        "あなたが「扶養する子」に数えられ続ける範囲です。判定は前年の所得に基づきます。",
+        (s2) => kyuyoShotoku(s2, P) <= lim);
+  }
+
+  // 同じ金額（または同じ「不可」）になった目的は先に出たものだけ残す。
+  // 例：週20時間未満なら「扶養から外れる」と「社会保険料が発生する」は同じ年収で起きる。
+  const seen = new Set();
+  return out.filter(g => {
+    const k = String(g.amount);
+    if (seen.has(k)) return false;
+    seen.add(k); return true;
+  });
+}
+
 /* ========================= 壁の一覧 ========================= */
 
 function walls(cfg) {
@@ -1179,6 +1274,7 @@ function render() {
     : `${kpDesc}で計算します。これは公式な全国標準値ではなく本ツール独自の仮定値です（誤差 ±${Math.round(kp.band*100)}％程度）。`;
 
   const r = simulate(cfg.income, cfg);
+  renderGoals(cfg);
   renderSummary(r, cfg);
   renderChart(cfg);
   renderStack(r, cfg);
@@ -1294,6 +1390,29 @@ function findReversal(cfg) {
   // どの壁が原因かを特定する（谷の直前で越えた壁）
   const cause = walls(cfg).filter(w => w.amount > best.peak && w.amount <= best.at).pop() ?? null;
   return { ...best, recover, cause };
+}
+
+/* ---------- 目的カード ---------- */
+function renderGoals(cfg) {
+  const box = $("goals");
+  box.innerHTML = goals(cfg).map(g => {
+    if (g.amount === null)
+      return `<div class="goal na"><div class="q">${g.q}</div>
+        <div class="amt">この条件では不可</div>
+        <div class="sub">いまの働き方では、年収に関係なく成立しません。${g.note}</div></div>`;
+    const net = simulate(g.amount, cfg).net;
+    return `<button type="button" class="goal" data-amount="${g.amount}">
+      <div class="q">${g.q}</div>
+      <div class="amt">${man(g.amount)}<small>まで</small></div>
+      <div class="sub">このとき手取り ${yen(net)}<br>${g.note}</div>
+    </button>`;
+  }).join("");
+  box.querySelectorAll("button.goal").forEach(b => b.addEventListener("click", () => {
+    F.income.value = b.dataset.amount;
+    F.incomeRange.value = Math.min(3000000, +b.dataset.amount);
+    render();
+    document.getElementById("tNet").closest("section").scrollIntoView({behavior:"smooth", block:"start"});
+  }));
 }
 
 /* ---------- 折れ線グラフ ---------- */
