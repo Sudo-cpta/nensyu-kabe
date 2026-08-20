@@ -16,237 +16,234 @@
 
 <style>
 /* ============================================================
-   トークン（ライト＝既定。ダークは2スコープで定義）
-   パレットは dataviz リファレンスパレットを使用し、
-   validate_palette.js で light / dark 双方の検証済み。
+   トークン。ライトが既定、ダークは media と data-theme の2スコープ。
+   系列色は dataviz のリファレンスパレット（light/dark 検証済み）。
    ============================================================ */
 :root {
   color-scheme: light;
-  --surface-1: #fcfcfb;
-  --page: #f9f9f7;
-  --surface-2: #f2f1ed;
-  --text-primary: #0b0b0b;
-  --text-secondary: #52514e;
-  --text-muted: #898781;
-  --grid: #e1e0d9;
-  --axis: #c3c2b7;
-  --border: rgba(11, 11, 11, 0.10);
-  --series-1: #2a78d6;  /* 本人の手取り */
-  --series-2: #eb6834;  /* 世帯全体の手取り増加額 */
-  --series-3: #1baf7a;  /* 内訳：所得税 */
-  --series-4: #eda100;  /* 内訳：住民税 */
-  --st-good: #0ca30c;
-  --st-warning: #fab219;
-  --st-critical: #d03b3b;
-  --good-ink: #006300;
-  --shadow: 0 1px 2px rgba(11,11,11,.05), 0 8px 24px rgba(11,11,11,.05);
+  --surface-1:#fcfcfb; --surface-2:#f4f3ef; --page:#f7f6f3;
+  --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#8a8880;
+  --grid:#e6e5de; --axis:#c9c8bd; --border:rgba(11,11,11,.09);
+  --accent:#2a78d6; --accent-wash:#eaf1fc; --accent-ink:#1c5cab;
+  --series-1:#2a78d6; --series-2:#eb6834; --series-3:#1baf7a; --series-4:#eda100;
+  --st-good:#0ca30c; --st-warning:#fab219; --st-critical:#d03b3b; --good-ink:#006300;
+  --crit-wash:#fdeeee; --warn-wash:#fdf5e3; --good-wash:#ecf7ec;
+  --shadow:0 1px 2px rgba(11,11,11,.04), 0 10px 28px rgba(11,11,11,.05);
+  --shadow-lift:0 2px 4px rgba(11,11,11,.05), 0 16px 40px rgba(11,11,11,.08);
+  --r-lg:16px; --r-md:10px; --r-sm:8px;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --surface-1: #1a1a19;
-    --page: #0d0d0d;
-    --surface-2: #232322;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --grid: #2c2c2a;
-    --axis: #383835;
-    --border: rgba(255, 255, 255, 0.10);
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
-    --series-4: #c98500;
-    --good-ink: #0ca30c;
-    --shadow: none;
-  }
-}
-:root[data-theme="dark"] {
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
   color-scheme: dark;
-  --surface-1: #1a1a19;
-  --page: #0d0d0d;
-  --surface-2: #232322;
-  --text-primary: #ffffff;
-  --text-secondary: #c3c2b7;
-  --text-muted: #898781;
-  --grid: #2c2c2a;
-  --axis: #383835;
-  --border: rgba(255, 255, 255, 0.10);
-  --series-1: #3987e5;
-  --series-2: #d95926;
-  --series-3: #199e70;
-  --series-4: #c98500;
-  --good-ink: #0ca30c;
-  --shadow: none;
+  --surface-1:#1a1a19; --surface-2:#242422; --page:#0d0d0d;
+  --text-primary:#fff; --text-secondary:#c3c2b7; --text-muted:#8e8c84;
+  --grid:#2c2c2a; --axis:#3d3d39; --border:rgba(255,255,255,.10);
+  --accent:#3987e5; --accent-wash:#15243a; --accent-ink:#9cc4f5;
+  --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+  --good-ink:#0ca30c;
+  --crit-wash:#2e1a1a; --warn-wash:#2c2515; --good-wash:#16261a;
+  --shadow:none; --shadow-lift:none;
+}}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --surface-1:#1a1a19; --surface-2:#242422; --page:#0d0d0d;
+  --text-primary:#fff; --text-secondary:#c3c2b7; --text-muted:#8e8c84;
+  --grid:#2c2c2a; --axis:#3d3d39; --border:rgba(255,255,255,.10);
+  --accent:#3987e5; --accent-wash:#15243a; --accent-ink:#9cc4f5;
+  --series-1:#3987e5; --series-2:#d95926; --series-3:#199e70; --series-4:#c98500;
+  --good-ink:#0ca30c;
+  --crit-wash:#2e1a1a; --warn-wash:#2c2515; --good-wash:#16261a;
+  --shadow:none; --shadow-lift:none;
 }
 
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }   /* .badge の display:inline-flex に負けないように */
-body {
-  margin: 0;
-  background: var(--page);
-  color: var(--text-primary);
-  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
-  font-size: 15px;
-  line-height: 1.7;
-  -webkit-text-size-adjust: 100%;
+*{margin:0;padding:0;box-sizing:border-box}
+[hidden]{display:none !important}
+body{
+  background:var(--page); color:var(--text-primary);
+  font-family:system-ui,-apple-system,"Segoe UI","Hiragino Sans","Noto Sans JP",sans-serif;
+  font-size:15px; line-height:1.75; -webkit-text-size-adjust:100%;
+  -webkit-font-smoothing:antialiased;
 }
-.wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 72px; }
+.wrap{max-width:1060px; margin:0 auto; padding:40px 20px 80px}
+b,strong{font-weight:700}
 
 /* ---------- ヘッダ ---------- */
-header { margin-bottom: 20px; }
-h1 { font-size: 26px; line-height: 1.35; margin: 0 0 8px; letter-spacing: -.01em; }
-.sub { color: var(--text-secondary); margin: 0 0 12px; font-size: 14px; }
-.badges { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.badge {
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; padding: 3px 10px; border-radius: 999px;
-  background: var(--surface-2); color: var(--text-secondary);
-  border: 1px solid var(--border);
+header{margin-bottom:28px}
+h1{font-size:clamp(26px,5vw,38px); line-height:1.2; letter-spacing:-.025em; font-weight:700}
+.sub{color:var(--text-secondary); margin:12px 0 16px; font-size:clamp(14px,2.4vw,17px); max-width:46em}
+.badges{display:flex; flex-wrap:wrap; gap:7px; align-items:center}
+.badge{
+  display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+  padding:4px 11px; border-radius:999px; background:var(--surface-2);
+  color:var(--text-secondary); border:1px solid var(--border);
 }
-.badge.warn { color: var(--text-primary); }
-.dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
+.dot{width:7px;height:7px;border-radius:50%;flex:none}
 
-/* ---------- カード ---------- */
-.card {
-  background: var(--surface-1);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px;
-  margin-bottom: 16px;
-  box-shadow: var(--shadow);
+/* ---------- カードと見出し ---------- */
+.card{
+  background:var(--surface-1); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:24px; margin-bottom:18px; box-shadow:var(--shadow);
 }
-.card > h2 {
-  font-size: 15px; margin: 0 0 4px; letter-spacing: .01em;
+.card h2{
+  display:flex; align-items:center; gap:11px;
+  font-size:17px; font-weight:700; letter-spacing:-.005em; margin-bottom:6px;
 }
-.card > .hint { font-size: 13px; color: var(--text-muted); margin: 0 0 16px; }
+.card h2 .n{
+  flex:none; width:26px; height:26px; border-radius:50%;
+  background:var(--accent-wash); color:var(--accent-ink);
+  font-size:13px; font-weight:700; display:grid; place-items:center;
+}
+.card .hint{font-size:13.5px; color:var(--text-muted); margin-bottom:20px; max-width:60em}
+.chart-head .hint{margin-bottom:0}
+
+/* 入力カード内のグループ見出し */
+.grp{
+  font-size:11.5px; font-weight:700; letter-spacing:.08em; color:var(--text-muted);
+  margin:22px 0 12px; padding-top:16px; border-top:1px solid var(--grid);
+}
+.grp:first-of-type{margin-top:0; padding-top:0; border-top:0}
 
 /* ---------- フォーム ---------- */
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px 18px; }
-.field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.field > label { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
-.field .note { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
-select, input[type="number"], input[type="text"] {
-  font: inherit; font-size: 14px;
-  padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--axis);
-  background: var(--surface-1);
-  color: var(--text-primary);
-  width: 100%;
-  min-width: 0;
+.grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:16px 20px}
+.field{display:flex; flex-direction:column; gap:6px; min-width:0}
+.field>label{font-size:12.5px; color:var(--text-secondary); font-weight:700}
+.field .note{font-size:11.5px; color:var(--text-muted); line-height:1.55}
+select,input[type="number"],input[type="text"]{
+  font:inherit; font-size:14px; padding:9px 11px; border-radius:var(--r-sm);
+  border:1px solid var(--axis); background:var(--surface-1); color:var(--text-primary);
+  width:100%; min-width:0; transition:border-color .12s, box-shadow .12s;
 }
-select:focus-visible, input:focus-visible, button:focus-visible, summary:focus-visible {
-  outline: 2px solid var(--series-1); outline-offset: 2px;
+select:hover,input[type="number"]:hover{border-color:var(--text-muted)}
+select:focus-visible,input:focus-visible,button:focus-visible,summary:focus-visible{
+  outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-wash);
 }
-input[type="range"] { width: 100%; accent-color: var(--series-1); }
-.checkline { display: flex; align-items: center; gap: 8px; font-size: 14px; }
-.checkline input { accent-color: var(--series-1); width: 16px; height: 16px; }
-.income-row { display: flex; align-items: baseline; gap: 10px; }
-.income-row input[type="number"] { width: 130px; }
-.income-row .unit { font-size: 13px; color: var(--text-muted); }
+summary:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+input[type="range"]{width:100%; accent-color:var(--accent); margin-top:2px}
+.checkline{display:flex; align-items:center; gap:9px; font-size:14px; min-height:38px}
+.checkline input{accent-color:var(--accent); width:17px; height:17px; flex:none}
+.checkline label{cursor:pointer}
+.income-row{display:flex; align-items:center; gap:9px}
+.income-row input[type="number"]{width:100%; max-width:150px; font-size:16px; font-weight:600}
+.income-row .unit{font-size:13px; color:var(--text-muted)}
 
-details.adv { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
-details.adv > summary {
-  cursor: pointer; font-size: 13px; font-weight: 600; color: var(--text-secondary);
-  list-style: none; display: flex; align-items: center; gap: 6px;
+details.adv{margin-top:20px; border-top:1px solid var(--grid); padding-top:14px}
+details.adv>summary{
+  cursor:pointer; font-size:13px; font-weight:700; color:var(--text-secondary);
+  list-style:none; display:flex; align-items:center; gap:7px; padding:4px 0; border-radius:var(--r-sm);
 }
-details.adv > summary::-webkit-details-marker { display: none; }
-details.adv > summary::before { content: "▸"; font-size: 11px; }
-details.adv[open] > summary::before { content: "▾"; }
-details.adv .grid { margin-top: 14px; }
+details.adv>summary::-webkit-details-marker{display:none}
+details.adv>summary::before{content:"▸"; font-size:10px; color:var(--text-muted); transition:transform .15s}
+details.adv[open]>summary::before{transform:rotate(90deg)}
+details.adv>summary:hover{color:var(--text-primary)}
+details.adv .grid{margin-top:16px}
 
-/* ---------- 結果 ---------- */
-.hero-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px 24px; }
-.tile { min-width: 0; }
-.tile .k { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
-.tile .v {
-  font-size: clamp(19px, 4.6vw, 26px); font-weight: 650;
-  letter-spacing: -.02em; line-height: 1.3; white-space: nowrap;
+/* ---------- 結果（このページの主役） ---------- */
+.card.result{
+  background:linear-gradient(180deg,var(--accent-wash) 0%,var(--surface-1) 190px);
+  box-shadow:var(--shadow-lift);
 }
-.tile .v.hero { font-size: clamp(25px, 6.1vw, 38px); line-height: 1.2; }
-.tile .d { font-size: 12px; color: var(--text-muted); }
-.tile .d.bad { color: var(--st-critical); font-weight: 600; }
-.tile .d.good { color: var(--good-ink); font-weight: 600; }
+.hero-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(146px,1fr)); gap:20px 26px}
+.tile{min-width:0}
+.tile .k{font-size:12px; color:var(--text-secondary); font-weight:700; margin-bottom:2px}
+.tile .v{
+  font-size:clamp(20px,4.6vw,27px); font-weight:700; letter-spacing:-.03em;
+  line-height:1.25; white-space:nowrap; font-variant-numeric:proportional-nums;
+}
+.tile .v.hero{font-size:clamp(30px,7.4vw,50px); line-height:1.1; letter-spacing:-.04em}
+.tile .d{font-size:12px; color:var(--text-muted); margin-top:3px; line-height:1.5}
+.hero-row .tile:first-child{grid-column:1/-1; padding-bottom:4px}
 
-.callout {
-  border-left: 3px solid var(--axis);
-  padding: 10px 0 10px 14px;
-  margin: 16px 0 0;
-  font-size: 14px;
-  color: var(--text-secondary);
+/* ---------- コールアウト ---------- */
+.callout{
+  border-left:3px solid var(--axis); background:var(--surface-2);
+  border-radius:0 var(--r-md) var(--r-md) 0;
+  padding:13px 16px; margin-top:16px; font-size:14px; color:var(--text-secondary);
 }
-.callout.crit { border-left-color: var(--st-critical); }
-.callout.warn { border-left-color: var(--st-warning); }
-.callout.good { border-left-color: var(--st-good); }
-.callout b { color: var(--text-primary); }
-.callout .ttl { display: flex; align-items: center; gap: 7px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.callout.crit{border-left-color:var(--st-critical); background:var(--crit-wash)}
+.callout.warn{border-left-color:var(--st-warning); background:var(--warn-wash)}
+.callout.good{border-left-color:var(--st-good); background:var(--good-wash)}
+.callout b{color:var(--text-primary)}
+.callout .ttl{
+  display:flex; align-items:center; gap:8px; font-weight:700;
+  color:var(--text-primary); margin-bottom:4px; font-size:14.5px;
+}
+.callout+.callout{margin-top:10px}
 
 /* ---------- グラフ ---------- */
-.chart-head { display: flex; flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--text-secondary); }
-.legend .item { display: flex; align-items: center; gap: 6px; }
-.legend .key { width: 16px; height: 2px; border-radius: 1px; flex: none; }
-.legend .key.sq { width: 11px; height: 11px; border-radius: 3px; }
-.chart-box { position: relative; width: 100%; overflow-x: auto; }
-svg { display: block; width: 100%; height: auto; }
-/* 幅を詰められても軸ラベルが潰れないよう、下限を割ったら横スクロールさせる */
-#chart { min-width: 620px; }
-#stack { min-width: 480px; }
-.stack-scroll { overflow-x: auto; }
-.tip {
-  position: absolute; pointer-events: none; z-index: 5;
-  background: var(--surface-1); border: 1px solid var(--border);
-  border-radius: 10px; padding: 9px 11px; font-size: 12px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.14); min-width: 168px;
-  color: var(--text-primary); opacity: 0; transition: opacity .1s;
+.chart-head{display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between; align-items:flex-start; margin-bottom:14px}
+.legend{display:flex; flex-wrap:wrap; gap:15px; font-size:12px; color:var(--text-secondary)}
+.legend .item{display:flex; align-items:center; gap:7px; white-space:nowrap}
+.legend .key{width:17px; height:3px; border-radius:2px; flex:none}
+.legend .key.sq{width:11px; height:11px; border-radius:3px}
+.chart-box{position:relative; width:100%; overflow-x:auto}
+svg{display:block; width:100%; height:auto}
+#chart{min-width:560px}
+#stack{min-width:460px}
+.stack-scroll{overflow-x:auto}
+.tip{
+  position:absolute; pointer-events:none; z-index:5;
+  background:var(--surface-1); border:1px solid var(--border);
+  border-radius:var(--r-md); padding:10px 12px; font-size:12px;
+  box-shadow:0 6px 22px rgba(0,0,0,.16); min-width:178px;
+  color:var(--text-primary); opacity:0; transition:opacity .1s;
 }
-.tip .th { font-weight: 700; margin-bottom: 5px; }
-.tip .tr { display: flex; justify-content: space-between; gap: 14px; }
-.tip .tr span:last-child { font-variant-numeric: tabular-nums; }
-.tip .tk { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; }
+.tip .th{font-weight:700; margin-bottom:6px}
+.tip .tr{display:flex; justify-content:space-between; gap:16px; line-height:1.7}
+.tip .tr span:last-child{font-variant-numeric:tabular-nums; font-weight:600}
+.tip .tk{display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:6px}
 
 /* ---------- テーブル ---------- */
-.tbl-scroll { overflow-x: auto; margin: 0 -18px; padding: 0 18px; }
-table { border-collapse: collapse; width: 100%; font-size: 13px; min-width: 560px; }
-th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--grid); vertical-align: top; }
-th { font-size: 11px; color: var(--text-muted); font-weight: 600; letter-spacing: .04em; white-space: nowrap; }
-td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-tbody tr.hit { background: var(--surface-2); }
-tbody tr.hit td:first-child { font-weight: 700; }
-.pill { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text-secondary); white-space: nowrap; }
+.tbl-scroll{overflow-x:auto; margin:0 -24px; padding:0 24px}
+table{border-collapse:collapse; width:100%; font-size:13px; min-width:560px}
+th,td{text-align:left; padding:11px 12px; border-bottom:1px solid var(--grid); vertical-align:top}
+thead th{
+  font-size:11px; color:var(--text-muted); font-weight:700; letter-spacing:.05em;
+  white-space:nowrap; border-bottom:1px solid var(--axis); padding-bottom:9px;
+}
+tbody tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+tbody tr.hit{background:var(--accent-wash)}
+tbody tr.hit td:first-child{font-weight:700}
+tbody tr.hit td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
+.pill{
+  display:inline-block; font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:999px;
+  border:1px solid var(--border); background:var(--surface-2); color:var(--text-secondary);
+  white-space:nowrap; margin-top:4px;
+}
+
+/* ---------- ボタン ---------- */
+.btnrow{display:flex; flex-wrap:wrap; gap:9px; align-items:center}
+button.act{
+  font:inherit; font-size:13.5px; font-weight:700; padding:9px 17px; border-radius:var(--r-sm);
+  cursor:pointer; border:1px solid var(--axis); background:var(--surface-1); color:var(--text-primary);
+  transition:background .12s, border-color .12s;
+}
+button.act:hover{background:var(--surface-2); border-color:var(--text-muted)}
+button.act.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+button.act.primary:hover{background:var(--accent-ink); border-color:var(--accent-ink)}
+.copied{font-size:12.5px; font-weight:600; color:var(--good-ink)}
 
 /* ---------- フッタ ---------- */
-footer { margin-top: 32px; font-size: 12px; color: var(--text-muted); line-height: 1.8; }
-footer h3 { font-size: 12px; color: var(--text-secondary); margin: 18px 0 4px; }
-footer ul { margin: 0; padding-left: 18px; }
-footer a { color: inherit; }
-.disclaimer {
-  background: var(--surface-2); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 14px; font-size: 12.5px;
-  color: var(--text-secondary); line-height: 1.75;
+footer{margin-top:40px; font-size:12.5px; color:var(--text-muted); line-height:1.85}
+footer h3{font-size:12px; color:var(--text-secondary); margin:22px 0 6px; letter-spacing:.04em; font-weight:700}
+footer ul{margin:0; padding-left:19px}
+footer li{margin-bottom:3px}
+footer a{color:inherit}
+.disclaimer{
+  background:var(--surface-2); border:1px solid var(--border); border-radius:var(--r-md);
+  padding:15px 17px; font-size:12.5px; color:var(--text-secondary); line-height:1.8;
 }
-.disclaimer b { color: var(--text-primary); }
+.disclaimer b{color:var(--text-primary)}
+.scroll-hint{display:none; font-size:11.5px; color:var(--text-muted); margin-top:6px}
 
-.btnrow { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-button.act {
-  font: inherit; font-size: 13px; font-weight: 600;
-  padding: 7px 14px; border-radius: 8px; cursor: pointer;
-  border: 1px solid var(--axis); background: var(--surface-1); color: var(--text-primary);
+@media (max-width:620px){
+  .wrap{padding:26px 14px 60px}
+  .card{padding:17px; border-radius:13px}
+  .card h2{font-size:16px}
+  .tbl-scroll{margin:0 -17px; padding:0 17px}
+  .hero-row{grid-template-columns:1fr 1fr; gap:16px 18px}
+  .card.result{background:linear-gradient(180deg,var(--accent-wash) 0%,var(--surface-1) 160px)}
+  .scroll-hint{display:block}
 }
-button.act:hover { background: var(--surface-2); }
-.copied { font-size: 12px; color: var(--good-ink); align-self: center; }
-
-@media (max-width: 560px) {
-  h1 { font-size: 21px; }
-  .card { padding: 15px; }
-  .tbl-scroll { margin: 0 -15px; padding: 0 15px; }
-  /* 狭い画面ではヒーロー数値を1行占有させる（隣のタイルへのはみ出しを防ぐ） */
-  .hero-row { grid-template-columns: 1fr 1fr; gap: 14px 16px; }
-  .hero-row .tile:first-child { grid-column: 1 / -1; }
-  .scroll-hint { display: block; }
-}
-.scroll-hint { display: none; font-size: 11px; color: var(--text-muted); margin: 4px 0 0; }
 </style>
 
 <div class="wrap">
@@ -264,8 +261,9 @@ button.act:hover { background: var(--surface-2); }
 
 <!-- ===================== 入力 ===================== -->
 <section class="card">
-  <h2>1. あなたの状況</h2>
+  <h2><span class="n">1</span>あなたの状況</h2>
   <p class="hint">まずここを埋めてください。以降の結果はすべてこの条件で再計算されます。</p>
+  <div class="grp">あなたのこと</div>
   <div class="grid">
     <div class="field">
       <label for="year">年分（収入を得る年）</label>
@@ -321,7 +319,8 @@ button.act:hover { background: var(--surface-2); }
     </div>
   </div>
 
-  <div class="grid" style="margin-top:16px">
+  <div class="grp">働き方と社会保険</div>
+  <div class="grid">
     <div class="field">
       <label for="weekly20">週の所定労働時間</label>
       <select id="weekly20">
@@ -410,8 +409,8 @@ button.act:hover { background: var(--surface-2); }
 </section>
 
 <!-- ===================== 結果サマリ ===================== -->
-<section class="card">
-  <h2>2. この年収でのあなたの手取り</h2>
+<section class="card result">
+  <h2><span class="n">2</span>この年収でのあなたの手取り</h2>
   <p class="hint" id="statusLine"></p>
   <div class="hero-row">
     <div class="tile"><div class="k">あなたの手取り（年間）</div><div class="v hero" id="tNet">—</div><div class="d" id="tNetSub"></div></div>
@@ -426,7 +425,7 @@ button.act:hover { background: var(--surface-2); }
 <section class="card">
   <div class="chart-head">
     <div>
-      <h2>3. 年収を変えたときの手取りカーブ</h2>
+      <h2><span class="n">3</span>年収を変えたときの手取りカーブ</h2>
       <p class="hint" style="margin:0">縦の細い線が「壁」。青と橙の差が、あなたの収入によって扶養者側に生じる増税分です。扶養者の税が増えていない区間では、2本の線は完全に重なります。</p>
     </div>
     <div class="legend">
@@ -446,7 +445,7 @@ button.act:hover { background: var(--surface-2); }
 <section class="card">
   <div class="chart-head">
     <div>
-      <h2>4. 額面年収の内訳</h2>
+      <h2><span class="n">4</span>額面年収の内訳</h2>
       <p class="hint" style="margin:0">額面がどこへ消えるか。数値は下の表にも掲載しています。</p>
     </div>
     <div class="legend">
@@ -467,7 +466,7 @@ button.act:hover { background: var(--surface-2); }
 
 <!-- ===================== 壁一覧 ===================== -->
 <section class="card">
-  <h2>5. あなたに関係する「壁」の一覧</h2>
+  <h2><span class="n">5</span>あなたに関係する「壁」の一覧</h2>
   <p class="hint">選んだ年分・立場で実際に効く壁だけを並べています。網掛けの行が、いまの年収が到達している段階です。</p>
   <div class="tbl-scroll">
     <table id="wallTbl">
@@ -479,17 +478,17 @@ button.act:hover { background: var(--surface-2); }
 
 <!-- ===================== 多子世帯 ===================== -->
 <section class="card" id="tashiCard">
-  <h2>6. 多子世帯の学費支援への影響</h2>
+  <h2><span class="n">6</span>多子世帯の学費支援への影響</h2>
   <p class="hint">扶養する子が3人以上いる世帯は、所得制限なしで大学等の授業料・入学金が上限まで減免されます。あなたが扶養から外れると、その人数カウントが崩れます。</p>
   <div id="tashiBody"></div>
 </section>
 
 <!-- ===================== 共有 ===================== -->
 <section class="card">
-  <h2>7. この条件を共有する</h2>
+  <h2><span class="n">7</span>この条件を共有する</h2>
   <p class="hint">いまの入力内容をURLに埋め込みます。SNSやメールでそのまま渡せます。</p>
   <div class="btnrow">
-    <button class="act" id="btnShare">条件付きURLをコピー</button>
+    <button class="act primary" id="btnShare">条件付きURLをコピー</button>
     <button class="act" id="btnReset">初期値に戻す</button>
     <span class="copied" id="copied" hidden>コピーしました</span>
   </div>
@@ -553,8 +552,9 @@ button.act:hover { background: var(--surface-2); }
    法改正時はここだけを差し替えれば全画面に反映されます。
    ========================================================================== */
 
-const VERSION = "2026年8月版 rev.3";
+const VERSION = "2026年8月版 rev.4";
 const CHANGELOG = [
+  ["2026年8月版 rev.4", "デザインを改良。章見出しに番号バッジを付けて階層を明確にし、入力欄をグループ分けして密度を下げた。手取りの表示を主役として強調し、注意書きは種類ごとに色分けした背景を付けた。グラフには手取りの面塗りを加え、壁のラベルが線と重ならないようにした。計算内容の変更はない。"],
   ["2026年8月版 rev.3", "PRレビューの指摘を反映。19歳以上23歳未満（配偶者を除く）の健康保険の被扶養者認定基準を150万円未満に修正（2025年10月1日以降）。多子世帯の「子ども」の算入上限を、学生世代の特定親族について合計所得95万円に修正。住民税の非課税限度額に扶養親族数と級地区分を導入し、所得割と均等割を別々に判定するようにした。調整控除を合計所得2,500万円超で適用なしとした。国保の賦課限度額を区分別の合計とし、40歳未満に介護分を含めないようにした。"],
   ["2026年8月版 rev.2", "一次資料に基づく監査を反映。調整控除の人的控除差を独立マスタ化し、特定親族特別控除・配偶者特別控除の差額を0円に修正（従来は所得税と住民税の控除額の実差を用いており、扶養者の住民税を最大9,000円過小に計上していた）。給与所得控除の境界帯（給与収入2,191,000〜2,199,999円）の定額処理を追加。国民健康保険に平等割と均等割・平等割の軽減（7割／5割／2割）を追加。"],
   ["2026年8月版", "令和8年度税制改正を反映（所得税の非課税ライン178万円、扶養の所得要件62万円）。社会保険の適用拡大タイムライン（2026年10月の賃金要件撤廃ほか）に対応。国民健康保険を概算／自治体料率入力の2モードに。令和10年分を予定値として追加。"],
@@ -1333,11 +1333,15 @@ function renderChart(cfg) {
     const col = w.kind === "tuition" ? "var(--st-critical)"
               : w.kind === "shaho" ? "var(--st-warning)" : "var(--axis)";
     g += `<line x1="${X(w.amount)}" y1="${CH.mt}" x2="${X(w.amount)}" y2="${Y(0)}" stroke="${col}" stroke-width="1" opacity=".75"/>`;
-    const ty = CH.mt + 11 + (i % 3) * 15;
-    g += `<text x="${X(w.amount)+4}" y="${ty}" font-size="10" fill="var(--text-muted)" style="font-variant-numeric:tabular-nums">${(w.amount/10000).toFixed(0)}万</text>`;
+    const ty = CH.mt + 12 + (i % 3) * 16;
+    const lab = `${(w.amount/10000).toFixed(0)}万`;
+    g += `<rect x="${X(w.amount)+3}" y="${ty-10}" width="${lab.length*7+4}" height="13" rx="3" fill="var(--surface-1)" opacity=".85"/>`;
+    g += `<text x="${X(w.amount)+5}" y="${ty}" font-size="10.5" font-weight="600" fill="var(--text-secondary)" style="font-variant-numeric:tabular-nums">${lab}</text>`;
   });
 
   const path = key => "M" + pts.map(p => `${X(p.x).toFixed(1)} ${Y(Math.max(0,p[key])).toFixed(1)}`).join(" L");
+  // 本人の手取りの下に薄いウォッシュを敷き、2本が重なる区間でも面で読めるようにする
+  g += `<path d="${path("net")} L${X(maxX).toFixed(1)} ${Y(0)} L${X(0).toFixed(1)} ${Y(0)} Z" fill="var(--series-1)" opacity=".10"/>`;
   g += `<path d="${path("gain")}" fill="none" stroke="var(--series-2)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
   g += `<path d="${path("net")}" fill="none" stroke="var(--series-1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
 
