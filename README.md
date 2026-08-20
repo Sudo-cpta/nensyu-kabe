@@ -1,6 +1,6 @@
 # 年収の壁シミュレーター
 
-**公開URL： https://sudo-cpta.github.io/nensyu-kabe/**
+**公開URL： https://kabe.nextaxion.jp/**
 
 立場・年分・働き方を変えると、手取りと家族の税負担がどう動くかを試算できる単一HTMLのツールです。
 サーバー不要・外部通信なしで動作します（`index.html` をブラウザで開くだけでも使えます）。
@@ -99,8 +99,8 @@ node test-engine.mjs
 GitHub Pages で公開しています。`main` ブランチに push すると1〜2分で自動的に反映されます。
 別途のアップロード作業は不要です。
 
-独自ドメイン（例：事務所サイト配下）に移す場合は、`index.html` 冒頭の `og:url` と
-`og:image` を新しいURLに書き換えてください。
+独自ドメイン `kabe.nextaxion.jp` を使用しています（リポジトリ直下の `CNAME` ファイルで指定）。
+ドメインを変更する場合は、`CNAME` と `index.html` 冒頭の `og:url` / `og:image` の3か所を書き換えてください。
 
 `SITE`（事務所名・問い合わせ先）は空にしています。設定するとフッタに「提供」欄が表示されます。
 
